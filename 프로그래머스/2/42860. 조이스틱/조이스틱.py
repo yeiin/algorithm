@@ -20,5 +20,3 @@ def solution(name):
 
     answer += shift
     return answer
-
-solution("JEROEN"	)
