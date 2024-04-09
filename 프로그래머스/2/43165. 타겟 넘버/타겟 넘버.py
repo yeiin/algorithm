@@ -1,6 +1,6 @@
 count = 0
 
-def bfs(numbers, target, num, index):
+def dfs(numbers, target, num, index):
     global count
 
     if(index == len(numbers)):
@@ -11,10 +11,10 @@ def bfs(numbers, target, num, index):
     temp = numbers[index]
     index += 1
     
-    bfs(numbers, target, num + temp, index)
-    bfs(numbers, target, num - temp, index)
+    dfs(numbers, target, num + temp, index)
+    dfs(numbers, target, num - temp, index)
 
 def solution(numbers, target):
     
-    bfs(numbers, target, 0, 0)
+    dfs(numbers, target, 0, 0)
     return count
