@@ -1,7 +1,7 @@
-import collections
+from collections import Counter
 
 def solution(nums):
-    nums_dict = collections.Counter(nums)
+    nums_dict = Counter(nums)
     answer = 0
     
     if len(nums_dict) < len(nums)/2:
