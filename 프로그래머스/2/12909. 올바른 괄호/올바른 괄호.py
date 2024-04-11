@@ -1,19 +1,18 @@
+from collections import deque
+
 def solution(s):
-    answer = True
-    stack = []
-    
-    for char in s:
-        if(char == ')'):
-            if(len(stack) == 0):
-                answer = False
-                break
-            else:
-                stack.pop()
-                answer = True
-        else:
-            stack.append(char)
-    
-    if(len(stack)!=0):
-        answer = False
-        
-    return answer
+  stack = deque()
+
+  for c in s:
+    if(c == '('):
+      stack.append(c)
+    else:
+      if not stack:
+        return False
+
+      stack.pop()
+
+  if stack:
+    return False
+  else:
+    return True
