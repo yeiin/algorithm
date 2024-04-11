@@ -1,20 +1,21 @@
-import heapq
+from heapq import heappush, heappop, heapify
 
 def solution(scoville, K):
-    answer = 0
+  heapify(scoville)
+  count = 0
 
-    heapq.heapify(scoville)
+  while True:
+    item = heappop(scoville)
     
-    while True:
-        temp1 = heapq.heappop(scoville)
-        if(temp1 >= K):
-            break
-        else:
-            answer += 1
-            if(len(scoville) == 0):
-                answer = -1
-                break
-            temp2 = heapq.heappop(scoville)
-            heapq.heappush(scoville, temp1 + 2*temp2)
+    if(item >= K):
+      break
     
-    return answer
+    if(len(scoville)<1):
+      return -1
+    second = heappop(scoville)
+    
+    count += 1
+    heappush(scoville, item + 2*second)
+
+
+  return count
