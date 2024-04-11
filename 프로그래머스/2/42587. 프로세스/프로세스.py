@@ -1,17 +1,33 @@
+from collections import deque
+
 def solution(priorities, location):
-    answer = 0
-    queue = [(i, prior) for i, prior in enumerate(priorities)]
-    maxPrio = max(queue, key=lambda x:x[1])
+  queue = []
 
-    while True:
-        temp = queue.pop(0)
-        if(temp == maxPrio):
-            answer += 1
-            if(temp[0] == location):
-                break
-            maxPrio = max(queue, key=lambda x:x[1])
-        else:
-            queue.append(temp)
+  for idx, num in enumerate(priorities):
+    queue.append((num, idx))
 
-    return answer
-            
+  q = deque(queue)
+  count = 1
+  m = max(q, key=lambda x: x[0])
+  cnt = q.count(m)
+
+
+  while True:
+
+    item = q.popleft()
+
+    if( (item[0] == m[0])):
+
+      if(item[1] == location):
+        return count
+      elif(cnt > 1):
+        q.append(item)
+      else:
+        count += 1
+
+      m = max(q, key=lambda x: x[0])
+      cnt = q.count(m)
+
+
+    else:
+      q.append(item)
