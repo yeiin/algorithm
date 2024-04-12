@@ -1,6 +1,6 @@
 count = 0
 
-def bfs(n, computers, nodes, index):
+def dfs(n, computers, nodes, index):
     if(nodes[index] == True):
         return
     else:
@@ -8,7 +8,7 @@ def bfs(n, computers, nodes, index):
     
     for idx, j in enumerate(computers[index]):
         if((j==1) and (idx != index)):
-            bfs(n, computers, nodes, idx)
+            dfs(n, computers, nodes, idx)
 
 def solution(n, computers):
     global count 
@@ -17,6 +17,6 @@ def solution(n, computers):
     for i in range(n):
         if(nodes[i] == False):
             count += 1
-            bfs(n, computers, nodes, i)
+            dfs(n, computers, nodes, i)
     
     return count
