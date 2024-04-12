@@ -1,6 +1,6 @@
 def solution(n, times):
-    answer = 0
     start = 1
+    answer = 0
     end = max(times) * n
 
     while start <= end:
@@ -8,7 +8,7 @@ def solution(n, times):
 
         count = 0
         for time in times:
-            count += mid // time
+            count += mid //time
         
         if(count < n):
             start = mid + 1
