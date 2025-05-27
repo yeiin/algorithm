@@ -54,22 +54,6 @@ class Solution {
                     }
                 }
                 
-                while(!q.isEmpty()){
-                    int[] curr = q.poll();
-                    routes[curr[0]][curr[1]] = true;
-                    
-                    for(int k=0; k<dx.length; k++){
-                        int nextI = curr[0] + dx[k];
-                        int nextJ = curr[1] + dy[k];
-                        
-                        if(pointValidation(nextI,nextJ)){
-                            if(visited[nextI][nextJ] && !routes[nextI][nextJ]) {
-                                q.add(new int[] {nextI,nextJ});
-                            }
-                            routes[nextI][nextJ] = true;   
-                        } 
-                    }
-                }
                 
                 
             }else{
@@ -89,22 +73,22 @@ class Solution {
                     }
                 }
                 
-                
-                while(!q.isEmpty()){
-                    int[] curr = q.poll();
-                    routes[curr[0]][curr[1]] = true;
-                    
-                    for(int k=0; k<dx.length; k++){
-                        int nextI = curr[0] + dx[k];
-                        int nextJ = curr[1] + dy[k];
-                        
-                        if(pointValidation(nextI,nextJ)){
-                            if(visited[nextI][nextJ] && !routes[nextI][nextJ]) {
-                                q.add(new int[] {nextI,nextJ});
-                            }
-                            routes[nextI][nextJ] = true;   
-                        } 
-                    }
+            }
+            
+            while(!q.isEmpty()){
+                int[] curr = q.poll();
+                routes[curr[0]][curr[1]] = true;
+
+                for(int k=0; k<dx.length; k++){
+                    int nextI = curr[0] + dx[k];
+                    int nextJ = curr[1] + dy[k];
+
+                    if(pointValidation(nextI,nextJ)){
+                        if(visited[nextI][nextJ] && !routes[nextI][nextJ]) {
+                            q.add(new int[] {nextI,nextJ});
+                        }
+                        routes[nextI][nextJ] = true;   
+                    } 
                 }
             }
            
