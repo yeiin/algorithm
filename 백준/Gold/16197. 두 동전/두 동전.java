@@ -83,28 +83,22 @@ public class Main{
                 nextMarble2[0] = curr.marble2[0] + dx[i];
                 nextMarble2[1] = curr.marble2[1] + dy[i];
 
-                boolean can1 = true;
-                boolean can2 = true;
+              
 
                 if(rangeCheck(nextMarble1)){
                     if(map[nextMarble1[0]][nextMarble1[1]].equals("#")){
                         nextMarble1 = curr.marble1;
-                    }else{
-                        if(!visited1[nextMarble1[0]][nextMarble1[1]]) can1 = true;
                     }
                 }
 
                 if(rangeCheck(nextMarble2)){
                     if(map[nextMarble2[0]][nextMarble2[1]].equals("#")){
                         nextMarble2 = curr.marble2;
-                    }else{
-                        if(!visited2[nextMarble2[0]][nextMarble2[1]]) can2 = true;
                     }
                 }
                 
               
-                if(can1 && can2)
-                    q.add(new Node(nextMarble1, nextMarble2, curr.count+1));
+                q.add(new Node(nextMarble1, nextMarble2, curr.count+1));
 
             }
         }
