@@ -3,7 +3,7 @@ import java.util.*;
 class Solution {
     
     int[] fees;
-    HashMap<Integer, Integer> answers = new HashMap();
+    TreeMap<Integer, Integer> answers = new TreeMap();
     HashMap<Integer, Integer> map = new HashMap();
     
     public int timeToInt(String time){
@@ -50,19 +50,16 @@ class Solution {
             int roundTime = timeToInt("23:59") - map.get(key);
 
             if(answers.containsKey(key)) {
-                    roundTime += answers.get(key);
+                roundTime += answers.get(key);
             }
                 
             answers.put(key, roundTime);
         }
                 
-        List<Integer> keyList = new ArrayList<>(answers.keySet());
-        Collections.sort(keyList);
-        int[] results = new int[keyList.size()];
-        
+        int[] results = new int[answers.size()];
         int index = 0;    
         
-        for(int key: keyList){
+        for(int key: answers.keySet()){
             results[index++] = getFee(answers.get(key));
         }
         
