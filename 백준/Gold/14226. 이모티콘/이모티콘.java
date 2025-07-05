@@ -1,62 +1,47 @@
 import java.util.*;
+import java.io.*;
 
-public class Main{
 
-    public static class Node{
-        int sticker;
-        int clip;
-        int count;
-
-        public Node(int sticker, int clip, int count){
-            this.sticker = sticker;
-            this.clip = clip;
-            this.count = count;
-        }
-    }
-
-    public static void main(String[] args){
-        Scanner sc = new Scanner(System.in);
-        int number = sc.nextInt();
-        int min = number;
-        sc.close();
-        boolean[][] visited = new boolean[2001][2001];
-
-        Queue<Node> q = new LinkedList<>();
-        q.add(new Node(1,0, 0));
+public class Main {
+    
+    public static void main(String[] args) throws IOException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int s = Integer.parseInt(br.readLine());
+        boolean[][] visited = new boolean[2*s+1][2*s+1];
+    
         visited[1][0] = true;
 
+        Queue<int[]> q = new LinkedList<>();
+        q.add(new int[]{1, 0, 0}); //이모티콘 수, 시간, clipboard에 수
+
+        int min = Integer.MAX_VALUE;
+
         while(!q.isEmpty()){
-            Node curr = q.poll();
+            int[] curr = q.poll();
 
-            if(curr.sticker == number){
-                min = Math.min(min,curr.count);
+            if(curr[0]==s){
+                min = Math.min(min, curr[1]);
+                continue;
             }
-                
-            if(curr.sticker > 0 && !visited[curr.sticker][curr.sticker]){
-              
-                q.add(new Node(curr.sticker, curr.sticker, curr.count+1));
-                visited[curr.sticker][curr.sticker] = true;
-            
-            }
-                
-            if(curr.clip > 0 && curr.sticker + curr.clip < 2000 && !visited[curr.sticker+curr.clip][curr.clip]){
-               
-                visited[curr.sticker+curr.clip][curr.clip] = true;
-                q.add(new Node(curr.sticker+curr.clip, curr.clip, curr.count+1));
-                
-            }
-                    
 
-            
-            if(curr.sticker > 0 && !visited[curr.sticker-1][curr.clip]){
-             
-                visited[curr.sticker - 1][curr.clip] = true;
-                q.add(new Node(curr.sticker - 1, curr.clip, curr.count+1));
-                
+             if(!visited[curr[0]][curr[0]]){
+                visited[curr[0]][curr[0]] = true;
+                q.add(new int[]{curr[0], curr[1]+1, curr[0]});
             }
-        }
 
-        System.out.println(min);
+            if(curr[0]+curr[2] < 2*s && !visited[curr[0] + curr[2]][curr[2]]){
+                visited[curr[0]+curr[2]][curr[2]] = true;
+                q.add(new int[]{curr[0]+curr[2], curr[1]+1, curr[2]});
+            }
+
+
+            if(curr[0]-1 > 1 && !visited[curr[0]-1][curr[2]]){
+                visited[curr[0]-1][curr[2]] = true;
+                q.add(new int[]{curr[0]-1, curr[1]+1, curr[2]});
+            }     
+
         
+        }
+        System.out.println(min);
     }
 }
