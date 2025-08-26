@@ -52,24 +52,21 @@ class Main{
 
                 if(curr[1]>=min) continue;
 
-                for(int i=0; i<4; i++){
-                    char[] digits = String.valueOf(curr[0]).toCharArray();
-                    for(char d='0'; d<='9'; d++){
-                        if (digits[i] == d) continue;
-                        if (i == 0 && d == '0') continue;
+                for (int i = 0; i < 4; i++) {
+                    int pow = (int) Math.pow(10, i);
+                    int digit = (curr[0] / pow) % 10; 
 
-                        char old = digits[i];
-                        digits[i] = d;
-                        int next = Integer.parseInt(new String(digits));
-                        digits[i] = old;
+                    for (int d = 0; d <= 9; d++) {
+                        if (d == digit) continue;
+                        if (i == 3 && d == 0) continue; 
+
+                        int next = curr[0] - digit * pow + d * pow;
 
                         if (!nDecimals[next] && !visited[next]) {
                             visited[next] = true;
                             q.add(new int[]{next, curr[1] + 1});
                         }
                     }
-
-                    
                 }
             }
 
