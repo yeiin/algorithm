@@ -5,26 +5,28 @@ class Solution {
         int n = edges.length + 1;
         int T = 0;
 
-        ArrayList<Integer>[] tree = new ArrayList[n];
-        for(int i=0;i<n;i++) tree[i] = new ArrayList<>();
+        HashMap<Integer, List<Integer>> map = new HashMap();
+        for(int i=0;i<n;i++) map.put(i, new ArrayList());
         for (int i=0;i<edges.length;i++) {
             int parent = edges[i][0];
             int child = edges[i][1];
-            tree[parent-1].add(child-1);
+            map.get(parent-1).add(child-1);
         }
-        for (int i=0;i<n;i++) Collections.sort(tree[i]);
+        for (int i=0;i<n;i++) Collections.sort(map.get(i));
 
         int[] pass = new int[n];
         int[] cnt = new int[n];
         boolean[] check = new boolean[n];
         ArrayList<Integer> Q = new ArrayList<>();
 
-        for (int i=0;i<n;i++) if (tree[i].isEmpty() && target[i]>0) T++;
+        for (int i=0;i<n;i++) if (map.get(i).isEmpty() && target[i]>0) T++;
 
         while (T>0) {
             int node = 0;
 
-            while (tree[node].size()>0) node = tree[node].get(pass[node]++ % tree[node].size());
+            while (map.get(node).size()>0) {
+                node = map.get(node).get(pass[node]++ % map.get(node).size());
+            }
 
             cnt[node]++;
             Q.add(node);
@@ -52,8 +54,6 @@ class Solution {
             }
         }
         
-        int[] answer = new int[res.size()];
-        for(int i=0;i<res.size();i++) answer[i] = res.get(i);
-        return answer;
+        return res.stream().mapToInt(Integer::intValue).toArray();
     }
 }
