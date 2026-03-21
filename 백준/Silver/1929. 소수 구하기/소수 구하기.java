@@ -1,37 +1,44 @@
-import java.util.*;
+import java.io.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.StringTokenizer;
 
-public class Main{
+class Main{
+    public static void main(String[] args) throws IOException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
-    public static boolean isPrime(int number){
+        List<Integer> answer = new LinkedList<>();
 
-        if(number == 1){
-            return false;
-        }
+        int a = Integer.parseInt(st.nextToken());
+        int b = Integer.parseInt(st.nextToken());
 
-        for(int j = 2; j<=Math.sqrt(number); j++){
-            if(number%j==0){
-                return false;
+        boolean[] nPrimes = new boolean[b+1];
+        
+        for(int i=2; i<=b; i++){
+
+            if(nPrimes[i]) continue;
+            boolean isPrime = true;
+            for(int j=2; j<=Math.sqrt(i); j++){
+                if(i%j==0){
+                    isPrime = true;
+                }
+            }
+
+            if(isPrime){
+                if(i>=a) answer.add(i);
+
+                int temp = i+i;
+                while(temp<=b){
+                    nPrimes[temp] = true;
+                    temp+=i;
+                }
+
             }
         }
-        return true;
-    }
 
-    public static void main(String[] args){
-
-        Scanner sc = new Scanner(System.in);
-
-        int m = sc.nextInt();
-        int n = sc.nextInt();
-
-        for(int i = m; i<=n; i++){
-            if(isPrime(i)){
-                System.out.println(i);
-            }
+        for(int c: answer){
+            System.out.println(c);
         }
-       
-        sc.close();
-
     }
-
-    
 }
