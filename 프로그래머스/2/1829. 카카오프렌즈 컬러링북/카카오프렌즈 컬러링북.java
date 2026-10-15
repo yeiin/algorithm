@@ -31,12 +31,11 @@ class Solution {
                         int nX = curr[0]+dx[x];
                         int nY = curr[1]+dy[x];
                         
-                        if(nX>=0 && nX<m && nY>=0 && nY<n){
-                            if(!visited[nX][nY] && picture[nX][nY]==c){
-                                q.add(new int[]{nX, nY});
-                                visited[nX][nY]=true;
-                                count ++;
-                            }
+                        if(nX<0 || nX>=m || nY<0 || nY>=n) continue;
+                        if(!visited[nX][nY] && picture[nX][nY]==c){
+                            q.add(new int[]{nX, nY});
+                            visited[nX][nY]=true;
+                            count ++;
                         }
                     }
                     
