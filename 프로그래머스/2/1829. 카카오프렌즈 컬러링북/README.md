@@ -1,10 +1,10 @@
 # [level 2] 카카오프렌즈 컬러링북 - 1829 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/1829?language=java) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/1829) 
 
 ### 성능 요약
 
-메모리: 86.1 MB, 시간: 15.62 ms
+메모리: 98.3 MB, 시간: 11.49 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2026년 03월 19일 02:17:25
+2026년 10월 16일 01:22:44
 
 ### 문제 설명
 
