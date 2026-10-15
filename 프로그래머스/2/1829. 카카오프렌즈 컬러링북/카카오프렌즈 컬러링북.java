@@ -11,7 +11,7 @@ class Solution {
         int[] answer = new int[2];
         
         boolean[][] visited = new boolean[m][n];
-        Queue<int[]> q = new LinkedList<>();
+        Queue<int[]> q = new ArrayDeque<>();
         
         
         for(int i=0; i<m; i++){
