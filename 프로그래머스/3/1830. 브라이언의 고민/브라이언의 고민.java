@@ -1,104 +1,188 @@
 import java.util.*;
 
-public class Solution {
+class Solution {
 
     public String solution(String sentence) {
-        StringBuilder answerList = new StringBuilder();
-        LinkedHashMap<Character, ArrayList<Integer>> lowerCount = new LinkedHashMap<>();
-        String invalid = "invalid";
-        try {
-            int size = sentence.length();
+        List<String> list = new ArrayList<>();
+        HashMap<Character, Integer> map = new HashMap<>();
 
-            for(int i=0; i<size; i++){
-                char c = sentence.charAt(i);
-
-                if(Character.isLowerCase(c)){
-                    if(!lowerCount.containsKey(c)){
-                        lowerCount.put(c, new ArrayList<Integer>());
-                    }
-                    lowerCount.get(c).add(i);
-                }
+        // 소문자 등장 횟수 기록
+        for (char c : sentence.toCharArray()) {
+            if (isLower(c)) {
+                map.put(c, map.getOrDefault(c, 0) + 1);
             }
+        }
 
-            int stringIdx = 0;
-            int startChar, endChar;
-            int lastStartChar = -1, lastEndChar = -1;
-            int startWord = 0, endWord = 0;
-            int lastStartWord= -1, lastEndWord = -1;
-            int count, distance;
-            int rule = 0;
+        char[] arr = sentence.toCharArray();
+        boolean[] used = new boolean[26];
 
-            ArrayList<Integer> temp;
-            for(char c : lowerCount.keySet()){
-                temp = lowerCount.get(c);
-                count = temp.size();
-                startChar = temp.get(0);
-                endChar = temp.get(count-1);
+        int idx = 0;
+        StringBuilder temp = new StringBuilder();
 
+        while (idx < arr.length) {
+            char c = arr[idx];
 
-                if(count == 1 || count >= 3){
-                    for(int i=1; i<count; i++){
-                        if(temp.get(i) - temp.get(i-1) != 2) return invalid;
+            // 1. 대문자로 시작하는 경우
+            if (isUpper(c)) {
+
+                // 규칙 1: 대문자 사이에 동일한 소문자가 반복
+                if (idx + 1 < arr.length
+                        && isLower(arr[idx + 1])
+                        && map.get(arr[idx + 1]) != 2) {
+
+                    char mark = arr[idx + 1];
+
+                    if (used[mark - 'a']) {
+                        return "invalid";
                     }
-                    rule = 1;
-                }
 
-                else if (count == 2){
-                    distance = endChar - startChar;
-
-                    if(distance == 2 && (endChar < lastEndChar && startChar > lastStartChar)){
-                        rule = 1;
+                    if (temp.length() > 0) {
+                        list.add(temp.toString());
+                        temp.setLength(0);
                     }
-                    else if(distance >= 2){
-                        rule = 2;
-                    }
-                    else  return invalid;
-                }
 
-                if(rule == 1){
-                    startWord = startChar -1;
-                    endWord = endChar+1;
+                    StringBuilder word = new StringBuilder();
+                    word.append(c);
 
-                    if(lastStartWord < startWord && lastEndWord > endWord){
-                        if(startChar - lastStartChar  == 2 && lastEndChar - endChar == 2){
-                            continue;
+                    int count = map.get(mark);
+                    idx++;
+
+                    for (int i = 0; i < count; i++) {
+
+                        if (idx >= arr.length || arr[idx] != mark) {
+                            return "invalid";
                         }
-                        else return invalid;
+
+                        idx++;
+
+                        if (idx >= arr.length || !isUpper(arr[idx])) {
+                            return "invalid";
+                        }
+
+                        word.append(arr[idx]);
+                        idx++;
+                    }
+
+                    used[mark - 'a'] = true;
+                    list.add(word.toString());
+
+                } else {
+                    // 규칙이 적용되지 않은 일반 대문자
+                    temp.append(c);
+                    idx++;
+                }
+
+            } else {
+                // 2. 소문자로 시작하는 경우: 규칙 2
+                if (map.get(c) != 2 || used[c - 'a']) {
+                    return "invalid";
+                }
+
+                int start = idx;
+                int end = sentence.indexOf(c, start + 1);
+
+                // 닫는 소문자가 없거나 내부에 문자가 없는 경우
+                if (end <= start + 1) {
+                    return "invalid";
+                }
+
+                if (!isUpper(arr[start + 1])) {
+                    return "invalid";
+                }
+
+                StringBuilder word = new StringBuilder();
+                boolean hasInnerLower = false;
+
+                // 규칙 2 내부에 규칙 1이 존재하는지 확인
+                for (int i = start + 1; i < end; i++) {
+                    if (isLower(arr[i])) {
+                        hasInnerLower = true;
+                        break;
                     }
                 }
 
-                else if (rule == 2){
-                    startWord = startChar;
-                    endWord = endChar;
-                    if(lastStartWord < startWord && lastEndWord > endWord) return invalid;
+                // 2-1. 규칙 1과 규칙 2가 중첩된 경우
+                if (hasInnerLower) {
+
+                    int length = end - start - 1;
+
+                    // 대문자 소문자 대문자 ... 대문자 형태
+                    if (length < 3 || length % 2 == 0) {
+                        return "invalid";
+                    }
+
+                    char inner = arr[start + 2];
+
+                    if (!isLower(inner)
+                            || inner == c
+                            || used[inner - 'a']) {
+                        return "invalid";
+                    }
+
+                    if (map.get(inner) != length / 2) {
+                        return "invalid";
+                    }
+
+                    for (int i = start + 1; i < end; i++) {
+
+                        if ((i - start - 1) % 2 == 0) {
+                            // 대문자 위치
+                            if (!isUpper(arr[i])) {
+                                return "invalid";
+                            }
+
+                            word.append(arr[i]);
+
+                        } else {
+                            // 동일한 소문자인지 확인
+                            if (arr[i] != inner) {
+                                return "invalid";
+                            }
+                        }
+                    }
+
+                    used[inner - 'a'] = true;
+
+                } else {
+                    // 2-2. 규칙 2만 적용된 경우
+                    for (int i = start + 1; i < end; i++) {
+
+                        if (!isUpper(arr[i])) {
+                            return "invalid";
+                        }
+
+                        word.append(arr[i]);
+                    }
                 }
 
-                if(lastEndWord >= startWord) return  invalid;
+                used[c - 'a'] = true;
 
-                if(stringIdx < startWord){
-                    answerList.append(makeWord(sentence,stringIdx,startWord-1));
-                    answerList.append(" ");
+                // 이전까지의 일반 단어 저장
+                if (temp.length() > 0) {
+                    list.add(temp.toString());
+                    temp.setLength(0);
                 }
-                answerList.append(makeWord(sentence,startWord,endWord));
-                answerList.append(" ");
-                lastStartWord = startWord;
-                lastEndWord = endWord;
-                lastStartChar = startChar;
-                lastEndChar = endChar;
-                stringIdx = endWord+1;
-            }
-            if(stringIdx < size){
-                answerList.append(makeWord(sentence,stringIdx,size-1));
+
+                list.add(word.toString());
+
+                // 규칙 2가 끝난 다음 위치부터 탐색
+                idx = end + 1;
             }
         }
-        catch (Exception e){
-            return invalid;
+
+        // 마지막 일반 단어 저장
+        if (temp.length() > 0) {
+            list.add(temp.toString());
         }
-        return answerList.toString().trim();
+
+        return String.join(" ", list);
     }
 
-    public String makeWord(String sentence, int start, int end){
-        String word = sentence.substring(start, end+1);
-        return word.replaceAll("[a-z]","");
+    private boolean isLower(char c) {
+        return c >= 'a' && c <= 'z';
+    }
+
+    private boolean isUpper(char c) {
+        return c >= 'A' && c <= 'Z';
     }
 }
