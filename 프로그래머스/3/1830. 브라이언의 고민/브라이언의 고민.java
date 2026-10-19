@@ -3,102 +3,90 @@ import java.util.*;
 public class Solution {
 
     public String solution(String sentence) {
-        StringBuilder answerList = new StringBuilder();
-        LinkedHashMap<Character, ArrayList<Integer>> lowerCount = new LinkedHashMap<>();
+        List<String> list = new ArrayList<>();
+        HashMap<Character, Integer> map = new HashMap<>();
+        char[] arr = sentence.toCharArray();
+        
         String invalid = "invalid";
-        try {
-            int size = sentence.length();
 
-            for(int i=0; i<size; i++){
-                char c = sentence.charAt(i);
-
-                if(Character.isLowerCase(c)){
-                    if(!lowerCount.containsKey(c)){
-                        lowerCount.put(c, new ArrayList<Integer>());
-                    }
-                    lowerCount.get(c).add(i);
-                }
+        // 소문자 등장 횟수 기록
+        for (char c : arr) {
+            if (Character.isLowerCase(c)) {
+                map.put(c, map.getOrDefault(c, 0) + 1);
             }
-
-            int stringIdx = 0;
-            int startChar, endChar;
-            int lastStartChar = -1, lastEndChar = -1;
-            int startWord = 0, endWord = 0;
-            int lastStartWord= -1, lastEndWord = -1;
-            int count, distance;
-            int rule = 0;
-
-            ArrayList<Integer> temp;
-            for(char c : lowerCount.keySet()){
-                temp = lowerCount.get(c);
-                count = temp.size();
-                startChar = temp.get(0);
-                endChar = temp.get(count-1);
-
-
-                if(count == 1 || count >= 3){
-                    for(int i=1; i<count; i++){
-                        if(temp.get(i) - temp.get(i-1) != 2) return invalid;
-                    }
-                    rule = 1;
+        }
+        
+        int idx = 0;
+        String temp = "";
+        
+        while(idx<sentence.length()){
+            if(Character.isUpperCase(arr[idx])){ //대문자로 시작하는 경우
+                
+                if(idx == sentence.length()-1){
+                    list.add(Character.toString(arr[idx]));
+                    idx++;
+                    continue;
                 }
-
-                else if (count == 2){
-                    distance = endChar - startChar;
-
-                    if(distance == 2 && (endChar < lastEndChar && startChar > lastStartChar)){
-                        rule = 1;
+                //대문자+소문자: 규칙 1 확인
+                if(Character.isLowerCase(arr[idx+1])){
+                    temp+=arr[idx++];
+                    while(idx<sentence.length()-1){
+                        if(idx+2<sentence.length() && arr[idx+2]==arr[idx]){
+                            temp+=arr[idx+1];
+                            idx+=2;
+                        }else{
+                            temp += arr[idx+1];
+                            list.add(temp);
+                            temp = "";
+                            idx+=2;
+                            break;
+                        }                   
                     }
-                    else if(distance >= 2){
-                        rule = 2;
+                    
+                    
+                }else{ //대문자+대문자
+                    while(idx<sentence.length() && Character.isUpperCase(arr[idx])){
+                        temp+=arr[idx];
+                        idx++;
                     }
-                    else  return invalid;
+                    list.add(temp);
+                    temp = "";
                 }
-
-                if(rule == 1){
-                    startWord = startChar -1;
-                    endWord = endChar+1;
-
-                    if(lastStartWord < startWord && lastEndWord > endWord){
-                        if(startChar - lastStartChar  == 2 && lastEndChar - endChar == 2){
-                            continue;
+                
+            }else { //소문자로 시작하는 경우
+                if(map.get(arr[idx])!=2) return invalid;
+                int ss = idx;
+                idx++;
+                while(idx<sentence.length()){
+                    if(Character.isLowerCase(arr[idx]) && arr[ss] == arr[idx++]){
+                        ss++; //대문자
+                        String stemp = "";
+                        if(Character.isLowerCase(arr[ss+1])){
+                            stemp+=arr[ss++];
+                            while(ss<idx-1){
+                                if(ss+2<idx && arr[ss+2]==arr[ss]){
+                                    stemp+=arr[ss+1];
+                                    ss+=2;
+                                }else{
+                                    stemp += arr[ss+1];
+                                    list.add(stemp);
+                                    break;
+                                }                   
+                            }
+                        }else{
+                            list.add(temp);
+                            temp = "";
                         }
-                        else return invalid;
+                        break;
                     }
+                    temp+=arr[idx];
+                    idx++;
                 }
-
-                else if (rule == 2){
-                    startWord = startChar;
-                    endWord = endChar;
-                    if(lastStartWord < startWord && lastEndWord > endWord) return invalid;
-                }
-
-                if(lastEndWord >= startWord) return  invalid;
-
-                if(stringIdx < startWord){
-                    answerList.append(makeWord(sentence,stringIdx,startWord-1));
-                    answerList.append(" ");
-                }
-                answerList.append(makeWord(sentence,startWord,endWord));
-                answerList.append(" ");
-                lastStartWord = startWord;
-                lastEndWord = endWord;
-                lastStartChar = startChar;
-                lastEndChar = endChar;
-                stringIdx = endWord+1;
+                
             }
-            if(stringIdx < size){
-                answerList.append(makeWord(sentence,stringIdx,size-1));
-            }
+            
         }
-        catch (Exception e){
-            return invalid;
-        }
-        return answerList.toString().trim();
-    }
-
-    public String makeWord(String sentence, int start, int end){
-        String word = sentence.substring(start, end+1);
-        return word.replaceAll("[a-z]","");
+        
+        return String.join(" ", list);
     }
 }
