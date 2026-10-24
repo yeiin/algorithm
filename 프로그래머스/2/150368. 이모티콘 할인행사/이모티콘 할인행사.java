@@ -2,70 +2,64 @@ import java.util.*;
 
 class Solution {
     
-    int n;
-    List<int[]> percentages;
+    int[] discounts = new int[]{10, 20, 30, 40};
+    List<int[]> discounted = new ArrayList<>();
     int[] arr;
     
     public void dfs(int depth){
         
-        if(depth==n){
-            percentages.add(arr.clone());
+        if(depth == arr.length){
+            discounted.add(arr.clone());
             return;
         }
         
-        for(int i=10; i<=40; i+=10){
-            arr[depth] = i;
+        for(int i=0; i<discounts.length; i++){
+            arr[depth] = discounts[i];
             dfs(depth+1);
         }
     }
     
+    
     public int[] solution(int[][] users, int[] emoticons) {
         int[] answer = {0, 0};
         
-        n = emoticons.length;
-        percentages = new ArrayList();
-        arr = new int[n];
+        arr = emoticons.clone();
         
-        int[][] eForSale = new int[emoticons.length][5];
-        
-        for(int i=0; i<emoticons.length; i++){
-            eForSale[i][0] = emoticons[i];
-            for(int j=1; j<5; j++){
-                eForSale[i][j] = eForSale[i][0] - eForSale[i][0]/10 * j;
-            }
-            
-        }
-        
+        //make discount 
         dfs(0);
         
-        for(int[] percentage: percentages){
-            
-            int price = 0;
-            int nSub = 0;
-            
-            for(int[] user: users){
+        for(int[] d: discounted){ //discount 경우의 수 별로
+            int plusCnt = 0;
+            int maxCost = 0;
+            for(int u=0; u<users.length; u++){ //사용자 별로 이 경우의 선택을 보면?
                 int temp = 0;
-                for(int p=0; p<percentage.length; p++){
-                    if(percentage[p]>=user[0]){
-                        temp += eForSale[p][percentage[p]/10];
+                boolean isPlus = false;
+                for(int i=0; i<d.length; i++){
+                    if(d[i]>=users[u][0]){
+                        temp += emoticons[i]* (100-d[i])/100;
                     }
                     
-                    if(temp>=user[1]) break;
-                    
+                    if(temp>=users[u][1]){
+                        isPlus = true;
+                        plusCnt++;
+                        break;
+                    }
                 }
                 
-                if(temp>=user[1]) nSub++;
-                else price += temp;
-                
+                if(!isPlus){
+                    maxCost += temp;
+                }
             }
-            
-            if(answer[0]<nSub){
-                answer = new int[]{nSub, price};
-            }else if(answer[0]==nSub && answer[1]<price){
-                answer = new int[]{nSub, price};
+                        
+            if(answer[0]<plusCnt){
+                answer[0] = plusCnt;
+                answer[1] = maxCost;
+            }else if(answer[0]==plusCnt && answer[1]<maxCost){
+                answer[0] = plusCnt;
+                answer[1] = maxCost;
             }
-            
         }
+        
         
         return answer;
     }
