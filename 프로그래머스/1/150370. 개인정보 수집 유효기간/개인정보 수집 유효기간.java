@@ -2,61 +2,66 @@ import java.util.*;
 
 class Solution {
     
-    public boolean isExpired(int[] today, int[] expiredDate){
-        if(today[0]<expiredDate[0]){
-            return false;
-        }else if(today[0]==expiredDate[0] && today[1] < expiredDate[1]){
-            return false;
-        }else if(today[0]==expiredDate[0] && today[1]==expiredDate[1] && today[2] <= expiredDate[2] ){
-            return false;
+    public int[] stableDate (int[] arr){
+        while(arr[1]>12){
+            arr[0]++;
+            arr[1]-=12;
         }
-        
-        return true;
+        return arr;
     }
     
-    public int[] expiredDate(int[] date, int term){
-        date[2]--;
-        date[1] += term;
+    public int[] stringDateToInt(String s){
+        String[] stringDate = s.split("\\.");
+        int[] date = new int[stringDate.length];
         
-        while(date[1]>12){
-            date[0]++;
-            date[1] -= 12;
+        for(int i=0; i<stringDate.length; i++){
+            date[i] = Integer.parseInt(stringDate[i]);
         }
-        
         return date;
     }
     
-    public int[] dateToInt(String date){
-        String[] dateList = date.split("\\.");        
-        int[] dateInt = new int[3];
-        
-        for(int i=0; i<dateInt.length; i++){
-            dateInt[i] = Integer.parseInt(dateList[i]);
-        }
-        
-        return dateInt;
-    }
-    
     public int[] solution(String today, String[] terms, String[] privacies) {
+        List<Integer> answers = new ArrayList<>();
+
+        int[] todayDate = stringDateToInt(today);
         
-        HashMap<String, Integer> map = new HashMap();
-        List<Integer> deleteList = new ArrayList();
-        
-        int[] todayInt = dateToInt(today);
-        
-        for(String term: terms){
-            String[] tempTerm = term.split(" ");
-            map.put(tempTerm[0], Integer.parseInt(tempTerm[1]));
+        HashMap<String, Integer> termsMap = new HashMap<>();
+        for(String t: terms){
+            String[] temp = t.split(" ");
+            termsMap.put(temp[0], Integer.parseInt(temp[1]));
         }
         
-        for(int i=0; i<privacies.length; i++){
-            String[] arr = privacies[i].split(" ");
-            int[] date = expiredDate(dateToInt(arr[0]), map.get(arr[1]));
+        List<int[]> list = new ArrayList<>();
+        for(String p: privacies){
+            String[] arr = p.split(" ");
+            int[] date = stringDateToInt(arr[0]);
             
-            if(isExpired(todayInt, date)) deleteList.add(i+1);
-            
+            date[1] += termsMap.get(arr[1]);
+            date = stableDate(date);
+            list.add(date);
         }
         
-        return deleteList.stream().mapToInt(Integer::intValue).toArray();
+        for(int i=0; i<list.size(); i++){
+            int[] p = list.get(i);
+                        
+            if(p[0]<todayDate[0]){
+                answers.add(i+1);
+                continue;
+            }else if(p[0]==todayDate[0] && p[1]<todayDate[1]){
+                answers.add(i+1);
+                continue;
+            }else if(p[0]==todayDate[0] && p[1]==todayDate[1] && p[2]<=todayDate[2]){
+                answers.add(i+1);
+                continue;
+            }
+        }
+        
+        int[] answer = new int[answers.size()];
+        for(int i=0; i<answers.size(); i++){
+            answer[i] = answers.get(i);
+        }
+
+        
+        return answer;
     }
 }
