@@ -48,17 +48,20 @@ class Solution {
             count+=times[i];
         }
         
-       
+        int sIdx = 0;
+        int eIdx = adv-1;
         long maxCount = count;
         int maxStart = 0;
-        for (int start = 1; start <= play - adv; start++) {
-            count -= times[start - 1];
-            count += times[start + adv - 1];
-
-            if (count > maxCount) {
+        while(eIdx<play-1){
+            count-=times[sIdx];
+            sIdx++;
+            eIdx++;
+            count+=times[eIdx];
+            
+            if(maxCount < count){
                 maxCount = count;
-                maxStart = start;
-            }
+                maxStart = sIdx;
+            }            
         }
         
         answer = secondToTime(maxStart);
