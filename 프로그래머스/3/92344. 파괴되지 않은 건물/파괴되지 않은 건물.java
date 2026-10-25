@@ -3,39 +3,41 @@ import java.util.*;
 class Solution {
     public int solution(int[][] board, int[][] skill) {
         int answer = 0;
+        int[][] table = new int[board.length+1][board[0].length+1];
         
-        int[][] map = new int[board.length+1][board[0].length+1];
-
         for(int[] s: skill){
-            int type = 1;
-            if(s[0]==1) type = -1;
-            
-            map[s[1]][s[2]] += type * s[5];
-            map[s[1]][s[4]+1] += -1 *type * s[5];
-            map[s[3]+1][s[4]+1] += type * s[5];
-            map[s[3]+1][s[2]] += -1 *type * s[5];
-            
+            if(s[0]==1){
+                table[s[1]][s[2]] -= s[5];
+                table[s[1]][s[4]+1] += s[5];
+                table[s[3]+1][s[2]] += s[5];
+                table[s[3]+1][s[4]+1] -= s[5];
+            }else{
+                table[s[1]][s[2]] += s[5];
+                table[s[1]][s[4]+1] -= s[5];
+                table[s[3]+1][s[2]] -= s[5];
+                table[s[3]+1][s[4]+1] += s[5];
+            } 
         }
         
-        for(int i=0; i<map.length; i++){
-            for(int j=1; j<map[i].length; j++){
-                map[i][j] += map[i][j-1];
+        for(int i=0; i<table.length; i++){
+            for(int j=1; j<table[0].length; j++){
+                table[i][j] += table[i][j-1];
             }
         }
         
-        
-        for(int j=0; j<map[0].length; j++){
-            for(int i=1; i<map.length; i++){
-                map[i][j] += map[i-1][j];
+        for(int j=0; j<table[0].length; j++){
+            for(int i=1; i<table.length; i++){
+                table[i][j] += table[i-1][j];
             }
         }
         
         for(int i=0; i<board.length; i++){
-            for(int j=0; j<board[i].length; j++){
-                if((map[i][j] + board[i][j])>=1) answer++;
+            for(int j=0; j<board[0].length; j++){
+                board[i][j] += table[i][j];
+                if(board[i][j]>=1) answer++;
             }
         }
-        
+                
         return answer;
     }
 }
