@@ -3,17 +3,9 @@ import java.util.*;
 class Solution {
 
     // 소문자별 등장 위치
-    private final Map<Character, List<Integer>> map = new HashMap<>();
-    private final Set<Character> used = new HashSet<>();
-    private static final String INVALID = "invalid";
-
-    private boolean isUpper(char c) {
-        return c >= 'A' && c <= 'Z';
-    }
-
-    private boolean isLower(char c) {
-        return c >= 'a' && c <= 'z';
-    }
+    Map<Character, List<Integer>> map = new HashMap<>();
+    Set<Character> used = new HashSet<>();
+    String INVALID = "invalid";
 
     // 대문자 사이에 같은 소문자가 들어간 형태 검증 및 복원
     // 예: AbBbC → ABC
@@ -23,12 +15,12 @@ class Solution {
         }
 
         if (s.length() == 1) {
-            return isUpper(s.charAt(0)) ? s : INVALID;
+            return Character.isUpperCase(s.charAt(0)) ? s : INVALID;
         }
 
         char marker = s.charAt(1);
 
-        if (!isLower(marker) || used.contains(marker)) {
+        if (!Character.isLowerCase(marker) || used.contains(marker)) {
             return INVALID;
         }
 
@@ -45,7 +37,7 @@ class Solution {
             char c = s.charAt(i);
 
             if (i % 2 == 0) {
-                if (!isUpper(c)) return INVALID;
+                if (!Character.isUpperCase(c)) return INVALID;
                 result.append(c);
             } else {
                 if (c != marker) return INVALID;
@@ -57,30 +49,24 @@ class Solution {
     }
 
     public String solution(String sentence) {
-        // 같은 객체에서 다시 호출되어도 이전 기록이 남지 않도록 초기화
-        map.clear();
-        used.clear();
 
         if (sentence.isEmpty()) return INVALID;
 
         char[] arr = sentence.toCharArray();
         List<String> words = new ArrayList<>();
 
-        // 소문자만 저장하고, 영문자가 아닌 문자는 거절
+        // 소문자만 저장
         for (int i = 0; i < arr.length; i++) {
             char c = arr[i];
-
-            if (isLower(c)) {
+            if (Character.isLowerCase(c)) {
                 map.computeIfAbsent(c, key -> new ArrayList<>()).add(i);
-            } else if (!isUpper(c)) {
-                return INVALID;
             }
         }
 
         for (int i = 0; i < arr.length; i++) {
             String word;
 
-            if (isLower(arr[i])) {
+            if (Character.isLowerCase(arr[i])) {
                 // 소문자로 감싸진 단어
                 char marker = arr[i];
                 List<Integer> positions = map.get(marker);
@@ -103,7 +89,7 @@ class Solution {
                 // 일부 문자만 보지 않고 내부 전체를 검사
                 boolean allUpper = true;
                 for (int j = 0; j < inner.length(); j++) {
-                    if (!isUpper(inner.charAt(j))) {
+                    if (!Character.isUpperCase(inner.charAt(j))) {
                         allUpper = false;
                         break;
                     }
@@ -119,7 +105,7 @@ class Solution {
                 i = end;
 
             } else {
-                if (i == arr.length - 1 || isUpper(arr[i + 1])) {
+                if (i == arr.length - 1 || Character.isUpperCase(arr[i + 1])) {
                     // 현재 대문자를 한 단어로 처리
                     word = String.valueOf(arr[i]);
 
