@@ -1,210 +1,159 @@
 import java.util.*;
 
-public class Solution {
+class Solution {
+
+    // 소문자별 등장 위치
+    private final Map<Character, List<Integer>> map = new HashMap<>();
+    private final Set<Character> used = new HashSet<>();
+    private static final String INVALID = "invalid";
+
+    private boolean isUpper(char c) {
+        return c >= 'A' && c <= 'Z';
+    }
+
+    private boolean isLower(char c) {
+        return c >= 'a' && c <= 'z';
+    }
+
+    // 대문자 사이에 같은 소문자가 들어간 형태 검증 및 복원
+    // 예: AbBbC → ABC
+    public String rules2(String s) {
+        if (s.isEmpty() || s.length() % 2 == 0) {
+            return INVALID;
+        }
+
+        if (s.length() == 1) {
+            return isUpper(s.charAt(0)) ? s : INVALID;
+        }
+
+        char marker = s.charAt(1);
+
+        if (!isLower(marker) || used.contains(marker)) {
+            return INVALID;
+        }
+
+        // 이 소문자가 현재 단어 밖에서도 사용되면 안 됨
+        List<Integer> positions = map.get(marker);
+        if (positions == null
+                || positions.size() != s.length() / 2) {
+            return INVALID;
+        }
+
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+
+            if (i % 2 == 0) {
+                if (!isUpper(c)) return INVALID;
+                result.append(c);
+            } else {
+                if (c != marker) return INVALID;
+            }
+        }
+
+        used.add(marker);
+        return result.toString();
+    }
 
     public String solution(String sentence) {
-        List<String> list = new ArrayList<>();
-        HashMap<Character, Integer> map = new HashMap<>();
+        // 같은 객체에서 다시 호출되어도 이전 기록이 남지 않도록 초기화
+        map.clear();
+        used.clear();
+
+        if (sentence.isEmpty()) return INVALID;
+
         char[] arr = sentence.toCharArray();
+        List<String> words = new ArrayList<>();
 
-        String invalid = "invalid";
-        int size = arr.length;
+        // 소문자만 저장하고, 영문자가 아닌 문자는 거절
+        for (int i = 0; i < arr.length; i++) {
+            char c = arr[i];
 
-        // 소문자 등장 횟수 기록
-        for (char c : arr) {
-            if (Character.isLowerCase(c)) {
-                map.put(c, map.getOrDefault(c, 0) + 1);
+            if (isLower(c)) {
+                map.computeIfAbsent(c, key -> new ArrayList<>()).add(i);
+            } else if (!isUpper(c)) {
+                return INVALID;
             }
         }
 
-        // can[i]: i부터 끝까지 올바르게 해석할 수 있는지
-        boolean[] can = new boolean[size + 1];
+        for (int i = 0; i < arr.length; i++) {
+            String word;
 
-        // next[i]: 현재 단어를 처리한 다음 위치
-        int[] next = new int[size];
+            if (isLower(arr[i])) {
+                // 소문자로 감싸진 단어
+                char marker = arr[i];
+                List<Integer> positions = map.get(marker);
 
-        // word[i]: i에서 시작하는 규칙 적용 단어
-        String[] word = new String[size];
-
-        can[size] = true;
-
-        // 뒤에서부터 가능한 해석 확인
-        for (int i = size - 1; i >= 0; i--) {
-
-            if (Character.isUpperCase(arr[i])) {
-
-                // 대문자 + 소문자: 규칙 1 확인
-                int end = checkRule1(arr, map, i);
-
-                if (end != -1 && can[end + 1]) {
-                    can[i] = true;
-                    next[i] = end + 1;
-                    word[i] = makeWord(arr, i, end);
+                if (used.contains(marker)
+                        || positions.size() != 2
+                        || positions.get(0) != i) {
+                    return INVALID;
                 }
-                else if (can[i + 1]) {
-                    // 일반 대문자로 처리
-                    can[i] = true;
-                    next[i] = i + 1;
+
+                int end = positions.get(1);
+
+                // 내부가 비어 있으면 안 됨
+                if (end <= i + 1) return INVALID;
+
+                used.add(marker);
+
+                String inner = sentence.substring(i + 1, end);
+
+                // 일부 문자만 보지 않고 내부 전체를 검사
+                boolean allUpper = true;
+                for (int j = 0; j < inner.length(); j++) {
+                    if (!isUpper(inner.charAt(j))) {
+                        allUpper = false;
+                        break;
+                    }
                 }
+
+                if (allUpper) {
+                    word = inner;
+                } else {
+                    word = rules2(inner);
+                    if (INVALID.equals(word)) return INVALID;
+                }
+
+                i = end;
 
             } else {
+                if (i == arr.length - 1 || isUpper(arr[i + 1])) {
+                    // 현재 대문자를 한 단어로 처리
+                    word = String.valueOf(arr[i]);
 
-                // 소문자로 시작: 규칙 2 확인
-                if (map.get(arr[i]) != 2) {
-                    continue;
-                }
+                } else {
+                    char marker = arr[i + 1];
+                    List<Integer> positions = map.get(marker);
 
-                int end = sentence.indexOf(arr[i], i + 1);
+                    if (used.contains(marker)
+                            || positions.get(0) != i + 1) {
+                        return INVALID;
+                    }
 
-                if (end != -1
-                        && checkRule2(arr, map, i, end)
-                        && can[end + 1]) {
+                    if (positions.size() == 2) {
+                        // 현재 대문자는 단독 단어로 처리
+                        // 다음 반복에서 소문자로 감싸진 부분을 처리
+                        word = String.valueOf(arr[i]);
 
-                    can[i] = true;
-                    next[i] = end + 1;
-                    word[i] = makeWord(arr, i, end);
-                }
-            }
-        }
+                    } else {
+                        // 마지막 소문자 다음에 대문자가 있어야 함
+                        int end = positions.get(positions.size() - 1) + 1;
 
-        if (!can[0]) return invalid;
+                        if (end >= arr.length) return INVALID;
 
-        // 원래 문자열 복원
-        int idx = 0;
-        StringBuilder temp = new StringBuilder();
+                        word = rules2(sentence.substring(i, end + 1));
+                        if (INVALID.equals(word)) return INVALID;
 
-        while (idx < size) {
-
-            if (word[idx] == null) {
-                // 규칙 없는 일반 대문자
-                temp.append(arr[idx]);
-
-            } else {
-                // 이전 일반 문자열 저장
-                if (temp.length() > 0) {
-                    list.add(temp.toString());
-                    temp.setLength(0);
-                }
-
-                // 규칙을 적용한 단어 저장
-                list.add(word[idx]);
-            }
-
-            idx = next[idx];
-        }
-
-        if (temp.length() > 0) {
-            list.add(temp.toString());
-        }
-
-        return String.join(" ", list);
-    }
-
-    // 규칙 1: 대문자 소문자 대문자 소문자 ... 대문자
-    private int checkRule1(
-            char[] arr,
-            HashMap<Character, Integer> map,
-            int start) {
-
-        int size = arr.length;
-
-        if (start + 1 >= size) return -1;
-        if (!Character.isLowerCase(arr[start + 1])) return -1;
-
-        char mark = arr[start + 1];
-        int count = map.get(mark);
-
-        int end = start + count * 2;
-
-        if (end >= size) return -1;
-
-        for (int i = start; i <= end; i++) {
-
-            if ((i - start) % 2 == 0) {
-                // 대문자 위치
-                if (!Character.isUpperCase(arr[i])) {
-                    return -1;
-                }
-            } else {
-                // 소문자 위치
-                if (arr[i] != mark) {
-                    return -1;
+                        i = end;
+                    }
                 }
             }
+
+            words.add(word);
         }
 
-        return end;
-    }
-
-    // 규칙 2: 소문자 + 단어 + 소문자
-    private boolean checkRule2(
-            char[] arr,
-            HashMap<Character, Integer> map,
-            int start,
-            int end) {
-
-        if (end <= start + 1) return false;
-
-        char inner = 0;
-
-        // 규칙 2 내부 확인
-        for (int i = start + 1; i < end; i++) {
-
-            if (Character.isLowerCase(arr[i])) {
-
-                if (inner == 0) {
-                    inner = arr[i];
-                }
-                else if (inner != arr[i]) {
-                    return false;
-                }
-
-            } else if (!Character.isUpperCase(arr[i])) {
-                return false;
-            }
-        }
-
-        // 내부에 소문자가 없으면 규칙 2만 적용
-        if (inner == 0) {
-            return true;
-        }
-
-        // 내부에 소문자가 있으면 규칙 1 중첩
-        int length = end - start - 1;
-
-        if (length % 2 == 0) return false;
-
-        // 내부 소문자 등장 횟수 확인
-        if (map.get(inner) != length / 2) {
-            return false;
-        }
-
-        for (int i = start + 1; i < end; i++) {
-
-            if ((i - start - 1) % 2 == 0) {
-                if (!Character.isUpperCase(arr[i])) {
-                    return false;
-                }
-            } else {
-                if (arr[i] != inner) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    // 소문자 제거 후 단어 복원
-    private String makeWord(char[] arr, int start, int end) {
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = start; i <= end; i++) {
-            if (Character.isUpperCase(arr[i])) {
-                sb.append(arr[i]);
-            }
-        }
-
-        return sb.toString();
+        return String.join(" ", words);
     }
 }
