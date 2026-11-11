@@ -8,7 +8,7 @@ class Solution {
         int[] answer = new int[2];
         
         boolean[][] visited = new boolean[m][n];
-        Queue<int[]> q = new LinkedList<>();
+        Queue<int[]> q = new ArrayDeque<>();
         
         int[] dx = {-1, 1, 0, 0};
         int[] dy = {0, 0, -1, 1};
@@ -32,7 +32,7 @@ class Solution {
                             int ny = curr[1] + dy[k];
                             
                             if(nx<0 || nx>=m || ny <0 || ny>=n || visited[nx][ny]) continue;
-                            if(picture[nx][ny] != area) continue;
+                            if(picture[nx][ny] != area || picture[nx][ny] == 0) continue;
                             
                             //next 
                             q.add(new int[]{nx, ny});
