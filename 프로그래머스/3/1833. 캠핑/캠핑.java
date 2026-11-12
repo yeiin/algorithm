@@ -25,8 +25,8 @@ class Solution {
            int baseY = data[i][1];
            
            // 지금까지 만난 중간 쐐기 중 기준점보다 큰 가장 가까운 y, 가장 가까운 y
-           long upper = Long.MAX_VALUE;
-           long lower = Long.MIN_VALUE;
+           int upper = Integer.MAX_VALUE;
+            int lower = Integer.MIN_VALUE;
            
            
            int j = i + 1; // 현재 노드보다 큰 것을 기준으로 x 가 1이라도 더 큰 지점으로 
