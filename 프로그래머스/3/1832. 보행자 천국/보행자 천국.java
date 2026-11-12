@@ -1,49 +1,55 @@
-import java.util.*;
-
 class Solution {
-
+    int MOD = 20170805;
     public int solution(int m, int n, int[][] cityMap) {
-        final int MOD = 20170805;
-
-        // 위에서 내려와서 이 칸에 도착하는 경로 수
-        int[][] down = new int[m][n];
-
-        // 왼쪽에서 오른쪽으로 와서 이 칸에 도착하는 경로 수
-        int[][] right = new int[m][n];
-
-        // 출발 경로 1개
-        // 출발점이 0이므로 어느 배열에 넣어도 됨
-        down[0][0] = 1;
-
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                if (i == 0 && j == 0) continue;
-                if (cityMap[i][j] == 1) continue;
-
-                // 위 칸에서 내려오는 경우
-                if (i > 0) {
-                    if (cityMap[i - 1][j] == 2) {
-                        // 위 칸이 직진 전용이면 아래 방향만 이어받음
-                        down[i][j] = down[i - 1][j];
-                    } else {
-                        down[i][j] =
-                            (down[i - 1][j] + right[i - 1][j]) % MOD;
+        
+        // 자동차는 오른쪽 또는 아래 방향으로 한 칸씩 이동 가능하다.
+            // 0은 자유롭게 이동 가능
+            // 1은 지나갈 수 없음
+            // 2는 왼쪽에서 들어오면 오른쪽으로만, 위에서 들어오면 아래쪽으로만 이동이 가능하다.
+        
+        // 같은 위치에 같은 방향으로 도착했다면, 그 이후 가능한 경로 수가 같다. 
+        // 즉 위치(x, y) + 방향을 고려한 DP
+        
+        // dp[m][n][0]: horizontal
+        // dp[m][n][1]: vertical
+        int[][][] dp = new int[m][n][2];
+        
+        //출발점에서 시작하는 경로는 하나뿐이라 한 지점만 1로 초기화한다. 
+        dp[0][0][0] = 1;        
+        
+        // dp[i][j][0] = 내 칸의 horizontal 경우의 수 (전 칸에 도달할 수 있는 경우 2가지)
+        // dp[i][j][1] = 내 칸의 vertical 경우의 수 (전 칸에 도달할 수 있는 경우 2가지) 
+        
+        // 방향이 위에서 내려오는 경우 (i>0)
+            // 만약 위에 칸이 2일 경우에는 경우의 수가 같다.
+            // 만약 위에 칸이 0일 경우에는 위칸에 왼쪽에서 도착했을 경우의 수 + 위에서 도착했을 경우의 수
+            
+        // 방향이 왼쪽에서 오는 경우 (j>0)
+            // 왼쪽 칸이 2인 경우에는 경우의 수가 같다.
+            // 만약 왼쪽 칸이 0인 경우에는 왼쪽에 도착했을 경우의 수 + 위에서 도착했을 경우의 수
+        
+        for(int i=0; i<m; i++){
+            for(int j=0; j<n; j++){
+                if(cityMap[i][j]==1) continue;
+                
+                if(i>0){ // 위 -> 아래
+                    if(cityMap[i-1][j]==2){
+                        dp[i][j][1] = dp[i-1][j][1];
+                    }else{
+                        dp[i][j][1] = (dp[i-1][j][1] + dp[i-1][j][0]) % MOD;
                     }
                 }
-
-                // 왼쪽 칸에서 오른쪽으로 오는 경우
-                if (j > 0) {
-                    if (cityMap[i][j - 1] == 2) {
-                        // 왼쪽 칸이 직진 전용이면 오른쪽 방향만 이어받음
-                        right[i][j] = right[i][j - 1];
-                    } else {
-                        right[i][j] =
-                            (down[i][j - 1] + right[i][j - 1]) % MOD;
+                
+                if(j>0){ //왼 -> 오
+                    if(cityMap[i][j-1]==2){
+                        dp[i][j][0] = dp[i][j-1][0];
+                    }else{
+                        dp[i][j][0] = (dp[i][j-1][1] + dp[i][j-1][0]) % MOD;
                     }
                 }
             }
         }
-
-        return (down[m - 1][n - 1] + right[m - 1][n - 1]) % MOD;
+        
+        return (dp[m-1][n-1][0] + dp[m-1][n-1][1]) % MOD;
     }
 }
